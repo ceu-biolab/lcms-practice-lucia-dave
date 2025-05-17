@@ -3,10 +3,11 @@ package lipid;
 import java.util.Objects;
 
 public class Lipid {
+
     private final int compoundId;
     private final String name;
     private final String formula;
-    private final String lipidType; // !! OPTIONAL TODO -> TRANSFORM INTO AN ENUMERATION
+    private final LipidType lipidType; // !! OPTIONAL TODO -> TRANSFORM INTO AN ENUMERATION
     private final int carbonCount;
     private final int doubleBondsCount;
 
@@ -19,7 +20,7 @@ public class Lipid {
      * @param carbonCount
      * @param doubleBondCount
      */
-    public Lipid(int compoundId, String name, String formula, String lipidType, int carbonCount, int doubleBondCount) {
+    public Lipid(int compoundId, String name, String formula, LipidType lipidType, int carbonCount, int doubleBondCount) {
         this.compoundId = compoundId;
         this.name = name;
         this.formula = formula;
@@ -40,16 +41,28 @@ public class Lipid {
         return formula;
     }
 
-    public String getLipidType() {
-        return this.lipidType;
-    }
-
     public int getCarbonCount() {
         return carbonCount;
     }
 
     public int getDoubleBondsCount() {
         return doubleBondsCount;
+    }
+
+    public LipidType getLipidType() {
+        return lipidType;
+    }
+
+    public int typeRank() {
+        switch (this.lipidType) {
+            case PG: return 1;
+            case PE: return 2;
+            case PI: return 3;
+            case PA: return 4;
+            case PS: return 5;
+            case PC: return 100; // <<
+            default: return 10;
+        }
     }
 
     @Override
