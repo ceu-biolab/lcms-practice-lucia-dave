@@ -1,0 +1,30 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Visible tests for the practice
+      id: visible-tests-for-the-practice
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Visible tests for the practice
+        setup-command: 'mvn clean '
+        command: mvn test
+        timeout: 10
+        max-score: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        VISIBLE-TESTS-FOR-THE-PRACTICE_RESULTS: "${{steps.visible-tests-for-the-practice.outputs.result}}"
+      with:
+        runners: visible-tests-for-the-practice
