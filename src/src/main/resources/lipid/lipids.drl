@@ -1,0 +1,139 @@
+package lipid;
+
+unit LipidScoreUnit;
+
+// Rules 1 to 3 - Each rule adds a score of +1
+rule "Rule 1: Same lipid type, same double bonds, more carbons, higher retention time"
+when
+    $a1 : /annotations [
+        $lipidType1 : lipid.getLipidType(),
+        $doubleBondCount1 : lipid.getDoubleBondsCount(),
+        $carbonCount1 : lipid.getCarbonCount(),
+        $retentionTime1 : rtMin
+    ]
+    $a2 : /annotations [
+        this != $a1,
+        lipid.getLipidType() == $lipidType1,
+        lipid.getDoubleBondsCount() == $doubleBondCount1,
+        lipid.getCarbonCount() < $carbonCount1,
+        rtMin < $retentionTime1
+    ]
+then
+    $a1.addScore(1);
+    $a2.addScore(1);
+    System.out.println("\nRule 1: Anotations have same lipid type, same DBs, more carbons, higher RT."
+            + "\nAdd a score of +1 to both anotations:\n - " + $a1 + "\n - " + $a2);
+end
+
+rule "Rule 2: Same lipid type, fewer double bonds, same carbons, higher retention time"
+when
+    $a1 : /annotations [
+        $lipidType1 : lipid.getLipidType(),
+        $doubleBondCount1 : lipid.getDoubleBondsCount(),
+        $carbonCount1 : lipid.getCarbonCount(),
+        $retentionTime1 : rtMin
+    ]
+    $a2 : /annotations [
+        this != $a1,
+        lipid.getLipidType() == $lipidType1,
+        lipid.getDoubleBondsCount() > $doubleBondCount1,
+        lipid.getCarbonCount() == $carbonCount1,
+        rtMin < $retentionTime1
+    ]
+then
+    $a1.addScore(1);
+    $a2.addScore(1);
+    System.out.println("\nRule 2: Anotations have same lipid type, fewer DBs, same carbons, higher RT."
+            + "\nAdd a score of +1 to both anotations:\n - " + $a1 + "\n - " + $a2);
+end
+
+rule "Rule 3: Different lipid type (higher type rank), same double bonds, same carbons, higher retention time"
+when
+    $a1 : /annotations [
+        $lipidType1 : lipid.getLipidType(),
+        $doubleBondCount1 : lipid.getDoubleBondsCount(),
+        $carbonCount1 : lipid.getCarbonCount(),
+        $retentionTime1 : rtMin
+    ]
+    $a2 : /annotations [
+        this != $a1,
+        lipid.getLipidType() != $lipidType1,
+        lipid.getDoubleBondsCount() == $doubleBondCount1,
+        lipid.getCarbonCount() == $carbonCount1,
+        rtMin < $retentionTime1
+    ]
+    eval($a1.getLipid().typeRank() > $a2.getLipid().typeRank())
+then
+    $a1.addScore(1);
+    $a2.addScore(1);
+    System.out.println("\nRule 3: Anotations have different lipid type (higher rank), same DBs, same carbons, higher RT."
+            + "\nAdd a score of +1 to both anotations:\n - " + $a1 + "\n - " + $a2);
+end
+
+// Rules 4 to 6 - Each rule adds a score of -1
+rule "Rule 4: Same lipid type, same double bonds, more carbons, lower retention time"
+when
+    $a1 : /annotations [
+        $lipidType1 : lipid.getLipidType(),
+        $doubleBondCount1 : lipid.getDoubleBondsCount(),
+        $carbonCount1 : lipid.getCarbonCount(),
+        $retentionTime1 : rtMin
+    ]
+    $a2 : /annotations [
+        this != $a1,
+        lipid.getLipidType() == $lipidType1,
+        lipid.getDoubleBondsCount() == $doubleBondCount1,
+        lipid.getCarbonCount() < $carbonCount1,
+        rtMin > $retentionTime1
+    ]
+then
+    $a1.addScore(-1);
+    $a2.addScore(-1);
+    System.out.println("\nRule 4: Anotations have same lipid type, same DBs, more carbons, lower RT."
+            + "\nAdd a score of -1 to both anotations:\n - " + $a1 + "\n - " + $a2);
+end
+
+rule "Rule 5: Same lipid type, fewer double bonds, same carbons, lower retention time"
+when
+    $a1 : /annotations [
+        $lipidType1 : lipid.getLipidType(),
+        $doubleBondCount1 : lipid.getDoubleBondsCount(),
+        $carbonCount1 : lipid.getCarbonCount(),
+        $retentionTime1 : rtMin
+    ]
+    $a2 : /annotations [
+        this != $a1,
+        lipid.getLipidType() == $lipidType1,
+        lipid.getDoubleBondsCount() > $doubleBondCount1,
+        lipid.getCarbonCount() == $carbonCount1,
+        rtMin > $retentionTime1
+    ]
+then
+    $a1.addScore(-1);
+    $a2.addScore(-1);
+    System.out.println("\nRule 5: Anotations have same lipid type, fewer DBs, same carbons, lower RT."
+            + "\nAdd a score of -1 to both anotations:\n - " + $a1 + "\n - " + $a2);
+end
+
+rule "Rule 6: Different lipid type (lower type rank), same double bonds, same carbons, lower retention time"
+when
+     $a1 : /annotations [
+         $lipidType1 : lipid.getLipidType(),
+         $doubleBondCount1 : lipid.getDoubleBondsCount(),
+         $carbonCount1 : lipid.getCarbonCount(),
+         $retentionTime1 : rtMin
+     ]
+     $a2 : /annotations [
+         this != $a1,
+         lipid.getLipidType() != $lipidType1,
+         lipid.getDoubleBondsCount() == $doubleBondCount1,
+         lipid.getCarbonCount() == $carbonCount1,
+         rtMin > $retentionTime1
+     ]
+     eval($a1.getLipid().typeRank() > $a2.getLipid().typeRank())
+then
+    $a1.addScore(-1);
+    $a2.addScore(-1);
+    System.out.println("\nRule 6: Anotations have different lipid type (lower rank), same DBs, same carbons, lower RT."
+            + "\nAdd a score of -1 to both anotations:\n - " + $a1 + "\n - " + $a2);
+end
